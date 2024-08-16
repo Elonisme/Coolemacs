@@ -39,16 +39,6 @@
 
 (global-set-key (kbd "C-c p") 'toggle-proxy)
 
-;; 控制文本的可视化宽度
-(use-package visual-fill-column
-  :ensure t
-  :hook ((text-mode . visual-fill-column-mode) ;; 启用文本模式下的 visual-fill-column
-         (markdown-mode . visual-fill-column-mode)) ;; 启用 Markdown 模式下的 visual-fill-column
-  :config
-  ;; 设置默认的列宽
-  (setq visual-fill-column-width 180)
-  )
-
 
 ;; 安装 all-the-icons
 (use-package all-the-icons
@@ -126,6 +116,7 @@
   :hook
   (
    (prog-mode . lsp-bridge-mode)
+   (org-mode . lsp-bridge-mode)
    )
   :config
   (setq lsp-bridge-python-lsp-server 'pylsp)
