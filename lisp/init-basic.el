@@ -3,42 +3,12 @@
 
 ;;; code:
 
-;; 启用 electric-pair-mode
-(electric-pair-mode 1)
 
-;; 使用代理
-(setq my-proxy "127.0.0.1:7890")
 
-;; Configure network proxy
-(defun show-proxy ()
-  "Show http/https proxy."
-  (interactive)
-  (if url-proxy-services
-      (message "Current proxy is \"%s\"" my-proxy)
-    (message "No proxy")))
-
-(defun set-proxy ()
-  "Set http/https proxy."
-  (interactive)
-  (setq url-proxy-services `(("http" . ,my-proxy)
-                             ("https" . ,my-proxy)))
-  (show-proxy))
-
-(defun unset-proxy ()
-  "Unset http/https proxy."
-  (interactive)
-  (setq url-proxy-services nil)
-  (show-proxy))
-
-(defun toggle-proxy ()
-  "Toggle http/https proxy."
-  (interactive)
-  (if url-proxy-services
-      (unset-proxy)
-    (set-proxy)))
-
-(global-set-key (kbd "C-c p") 'toggle-proxy)
-
+;; multiple-cursors
+(use-package multiple-cursors
+  :ensure t
+  )
 
 ;; 安装 all-the-icons
 (use-package all-the-icons
@@ -109,18 +79,92 @@
 
 
 ;; 自动补全
-(use-package lsp-bridge
-  :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
-            :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
-            :build (:not compile))
-  :hook
-  (
-   (prog-mode . lsp-bridge-mode)
-   (org-mode . lsp-bridge-mode)
-   )
+;; 安装并配置eglot
+(use-package eglot
+  :hook ((python-mode . eglot-ensure)
+         (c++-mode . eglot-ensure)
+         (c-mode . eglot-ensure)
+         (rust-mode . eglot-ensure))
   :config
-  (setq lsp-bridge-python-lsp-server 'pylsp)
+  (add-to-list 'eglot-server-programs '(python-mode . ("pylsp"))))
+
+;; company 补全
+(use-package company
+  :hook (after-init . global-company-mode)
+  :config
+  ;; 设置更灵活的补全前缀长度和延迟
+  (setq company-minimum-prefix-length 1
+        company-idle-delay 0.0
+        company-tooltip-align-annotations t  ;; 对齐注释
+        company-show-numbers t               ;; 显示编号
+        company-tooltip-limit 10             ;; 补全菜单的最大条目数量
+        company-dabbrev-downcase nil         ;; 保持补全大小写一致
+        company-dabbrev-ignore-case nil)
+  
+  ;; 配置 backends
+  (setq company-backends '((company-capf            ;; 补全 at point function，通常用于与 eglot 一起工作
+                            company-files           ;; 文件路径补全
+                            company-keywords        ;; 关键字补全
+                            company-yasnippet)      ;; 代码段补全
+                           (company-dabbrev-code    ;; 代码片段补全
+                            company-dabbrev
+                            company-etags            ;; 增加 etags 支持
+                            company-semantic)))      ;; 增加 semantic 支持
+  
+  ;; company-files 配置
+  (setq company-files-show-hidden t)                     ;; 显示隐藏文件
+  (setq company-files-env-vars t)                        ;; 补全路径中的环境变量，如 $HOME
+
+  ;; 配置 backend 的顺序和优先级
+  (setq company-transformers '(company-sort-by-backend-importance))
   )
+
+
+;; 增强补全排序和筛选
+(use-package company-prescient
+  :ensure t
+  :after company
+  :config
+  (company-prescient-mode 1)
+  (setq prescient-filter-method '(literal fuzzy)))  ;; 设置 prescient 的过滤方法
+
+
+;; 提供上下文帮助
+(use-package company-quickhelp
+  :ensure t
+  :hook (company-mode . company-quickhelp-mode)
+  :config
+  (setq company-quickhelp-delay 0.5))  ;; 设置帮助显示延迟
+
+
+;; AI 驱动的补全插件
+(use-package company-tabnine
+   :ensure t
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-tabnine))
+
+
+
+;; 美化 company 补全界面
+(use-package company-box
+  :ensure t
+  :hook (company-mode . company-box-mode)
+  :config
+  (setq company-box-icons-alist 'company-box-icons-all-the-icons ;; 使用 all-the-icons 图标
+        company-box-max-candidates 50                     ;; 显示最多 50 个候选项
+        company-box-backends-colors nil                    ;; 不同 backend 使用不同颜色
+        company-box-scrollbar t                            ;; 启用滚动条
+        company-box-doc-enable t                          ;; 启用文档显示
+        company-box-color-icon nil                         ;; 关闭图标着色
+        company-box-doc-max-width 60))                      ;; 设置文档最大宽度
+
+ ;; 频率最高的补全选项
+ (use-package company-statistics
+   :ensure t
+   :after company
+   :config
+   (company-statistics-mode 1))
 
 
 ;; 配置 'yasnippet'

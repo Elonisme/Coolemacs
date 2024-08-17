@@ -5,8 +5,6 @@
 ;; 安装和配置 Python 模式
 (use-package python-mode
   :ensure t
-  :hook
-  (python-mode . lsp-bridge-mode)
   :config
   (setq python-indent-offset 4))
 

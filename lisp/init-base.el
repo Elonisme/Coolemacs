@@ -65,7 +65,47 @@
 (setq delete-auto-save-files t)
 
 ;; set font size
-;; (set-face-attribute 'default nil :height 150)
+(set-face-attribute 'default nil :height 120)
+
+;; 启用 electric-pair-mode
+(electric-pair-mode 1)
+
+;; open pixel-scroll
+(pixel-scroll-mode t)
+(pixel-scroll-precision-mode t)
+
+;; 使用代理
+(setq my-proxy "127.0.0.1:7890")
+
+;; Configure network proxy
+(defun show-proxy ()
+  "Show http/https proxy."
+  (interactive)
+  (if url-proxy-services
+      (message "Current proxy is \"%s\"" my-proxy)
+    (message "No proxy")))
+
+(defun set-proxy ()
+  "Set http/https proxy."
+  (interactive)
+  (setq url-proxy-services `(("http" . ,my-proxy)
+                             ("https" . ,my-proxy)))
+  (show-proxy))
+
+(defun unset-proxy ()
+  "Unset http/https proxy."
+  (interactive)
+  (setq url-proxy-services nil)
+  (show-proxy))
+
+(defun toggle-proxy ()
+  "Toggle http/https proxy."
+  (interactive)
+  (if url-proxy-services
+      (unset-proxy)
+    (set-proxy)))
+
+(global-set-key (kbd "C-c p") 'toggle-proxy)
 
 
 (provide 'init-base)
