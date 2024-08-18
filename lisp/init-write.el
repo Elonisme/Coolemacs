@@ -98,8 +98,11 @@
   ;; 文学编程
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((latex . t)
-     (python .t)))
+   '((latex . t)  ;; 启用 Latex 支持
+     (python . t)  ;; 启用 Python 支持等
+     (clojure . t)  ;; 启用 Clojure 支持
+     (emacs-lisp . t)  ;; 启用 Emacs Lisp 支持
+     ))
 
 
   ;; 在org mode里美化字符串
@@ -193,14 +196,15 @@
   (org-mode . org-auto-tangle-mode)
   )
 
-
-(use-package deft
+(use-package denote
   :ensure t
-  :custom
-  (deft-directory "~/Documents/OrgMode/") ;; 替换为你的笔记目录
-  (deft-extensions '("org")) ;; 支持的文件扩展名
-  :bind
-  (("C-c d" . deft))) ;; 绑定快捷键
+  :config
+  ;; 你的 Denote 配置
+  (setq denote-directory "~/Documents/OrgMode") ;; 设置笔记存储目录
+  (setq denote-date-format "%Y-%m-%d") ;; 设置日期格式
+  (setq denote-file-type 'org) ;; 设置笔记文件类型（可选：'md、'org）
+  (setq denote-file-name-format "%Y-%m-%d-%s")) ;; 设置文件名格式
+
 
 
 (provide 'init-write)

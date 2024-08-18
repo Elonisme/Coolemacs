@@ -78,19 +78,17 @@
   (setq swiper-action-recenter t)) ;; 确保匹配项居中显示
 
 
-;; 自动补全
-;; 安装并配置eglot
+;; 安装并配置'eglot'
 (use-package eglot
-  :hook ((python-mode . eglot-ensure)
-         (c++-mode . eglot-ensure)
-         (c-mode . eglot-ensure)
-         (rust-mode . eglot-ensure))
+  :hook ((python-mode . eglot-ensure))
   :config
   (add-to-list 'eglot-server-programs '(python-mode . ("pylsp"))))
 
 ;; company 补全
 (use-package company
-  :hook (after-init . global-company-mode)
+  :hook ((prog-mode . company-mode)
+         (org-mode . company-mode)
+         )
   :config
   ;; 设置更灵活的补全前缀长度和延迟
   (setq company-minimum-prefix-length 1
@@ -116,9 +114,7 @@
   (setq company-files-env-vars t)                        ;; 补全路径中的环境变量，如 $HOME
 
   ;; 配置 backend 的顺序和优先级
-  (setq company-transformers '(company-sort-by-backend-importance))
-  )
-
+  (setq company-transformers '(company-sort-by-backend-importance)))
 
 ;; 增强补全排序和筛选
 (use-package company-prescient
@@ -139,11 +135,10 @@
 
 ;; AI 驱动的补全插件
 (use-package company-tabnine
-   :ensure t
+  :ensure t
   :after company
   :config
   (add-to-list 'company-backends 'company-tabnine))
-
 
 
 ;; 美化 company 补全界面
@@ -166,12 +161,14 @@
    :config
    (company-statistics-mode 1))
 
-
 ;; 配置 'yasnippet'
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
-  :hook (prog-mode . yas-minor-mode)
+  :hook
+  ((prog-mode . yas-minor-mode)
+   (org-mode . yas-minor-mode)
+   )
   :config
   (yas-global-mode 1))
 
@@ -183,7 +180,8 @@
 ;; 配置flycheck 的集成
 (use-package flycheck
   :ensure t
-  :init (global-flycheck-mode)
+  :hook
+  (company-mode . flycheck-mode)
   :config
   (setq flycheck-checker 'python-flake8)
   )
@@ -199,6 +197,14 @@
   (setq ispell-program-name "aspell")  ;; 设置使用的拼写检查程序，常用的还有 "hunspell"
   (setq ispell-dictionary "english")   ;; 设置默认的字典
   (setq ispell-personal-dictionary "~/.emacs.d/.ispell"))  ;; 设置个人字典路径
+
+;; 重启 emacs
+(use-package restart-emacs
+  :ensure t)
+
+;; vterm shell
+(use-package vterm
+  :ensure t)
 
 (provide 'init-basic)
 ;;; init-basic.el ends here
