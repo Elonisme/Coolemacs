@@ -2,7 +2,10 @@ places
 recentf
 amx-items
 tramp
+.dap-breakpoints
 elpa/
 straight/
 auto-save-list/
 transient/
+eshell/history 
+transient/history.el
