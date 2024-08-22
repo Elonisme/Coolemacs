@@ -108,6 +108,54 @@
 (global-set-key (kbd "C-c p") 'toggle-proxy)
 
 
+
+;; 启用原生编译的默认设置
+(setq native-comp-deferred-compilation t)  ;; 延迟编译，以加快启动速度
+
+;; 如果原生编译遇到问题，可以使用以下配置来忽略错误
+(setq native-comp-async-report-warnings-errors nil)  ;; 禁用编译错误和警告报告
+
+;; 为了避免在 Emacs 启动时显示警告，可以禁用原生编译的消息
+(setq native-comp-async-query-on-exit nil)  ;; 关闭退出时的编译警告
+
+;; 设置编译后的文件存放位置
+(setq native-comp-eln-load-path (list (expand-file-name "eln-cache/" user-emacs-directory)))
+
+;; 仅在需要时编译第三方包
+(setq package-native-compile t)  ;; 编译已安装的包
+
+;; 添加一些性能优化选项
+(setq comp-deferred-compilation t)  ;; 延迟编译，使 Emacs 更快启动
+(setq comp-async-report-warnings-errors nil)  ;; 禁止报告编译时的警告和错误
+
+;; 显示 Emacs 启动时的性能信息
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs startup time：%s seconds" (emacs-init-time))
+            ))
+
+;; 将垃圾回收阈值设置为 100MB，默认是 800KB
+(setq gc-cons-threshold (* 100 1024 1024))  ;; 增大垃圾回收的阈值，减少回收频率
+
+;; 将每次分配内存后进行垃圾回收的阈值设置为 0.1
+(setq gc-cons-percentage 0.1)  ;; 增加内存分配比例，减少垃圾回收的频率
+
+;; 在 Emacs 退出时恢复默认的垃圾回收设置
+(add-hook 'kill-emacs-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 20 1024 1024))  ;; 启动后将阈值恢复为较小的值
+            (setq gc-cons-percentage 0.1)))
+
+;; 在 Emacs 最小化或切换应用时，手动触发垃圾回收
+(add-hook 'focus-out-hook #'garbage-collect)
+
+;; 在 Emacs 空闲时延迟执行垃圾回收
+(run-with-idle-timer 5 t #'garbage-collect)  ;; 每隔 5 秒空闲时间执行垃圾回收
+
+;; 显示每次垃圾回收的信息（可选）
+(setq garbage-collection-messages t)  ;; 设置为 t 可以查看垃圾回收的详情
+
+
 (provide 'init-base)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-base.el ends here
