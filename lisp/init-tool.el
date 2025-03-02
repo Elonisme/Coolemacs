@@ -142,6 +142,18 @@
   :ensure t
   )
 
+;; 安装 EMMS
+(use-package emms
+  :ensure t
+  :config
+  (emms-all)
+  (setq emms-player-list '(emms-player-vlc))
+  (setq emms-info-functions '(emms-info-native))
+  )
+
+
+(use-package ivy-emms
+  :ensure t)
+
 (provide 'init-tool)
 ;;; init-basic.el ends here
-
