@@ -97,11 +97,6 @@
   :hook ((after-init . global-corfu-mode)
          (global-corfu-mode . corfu-popupinfo-mode)))
 
-(unless (display-graphic-p)
-  (use-package corfu-terminal
-    :ensure t
-    :hook (global-corfu-mode . corfu-terminal-mode)))
-
 
 (use-package ivy-rich
   :ensure t
@@ -151,9 +146,41 @@
   (setq emms-info-functions '(emms-info-native))
   )
 
-
 (use-package ivy-emms
   :ensure t)
+
+;; 使用代理
+(setq my-proxy "127.0.0.1:7890")
+
+;; Configure network proxy
+(defun show-proxy ()
+  "Show http/https proxy."
+  (interactive)
+  (if url-proxy-services
+      (message "Current proxy is \"%s\"" my-proxy)
+    (message "No proxy")))
+
+(defun set-proxy ()
+  "Set http/https proxy."
+  (interactive)
+  (setq url-proxy-services `(("http" . ,my-proxy)
+                             ("https" . ,my-proxy)))
+  (show-proxy))
+
+(defun unset-proxy ()
+  "Unset http/https proxy."
+  (interactive)
+  (setq url-proxy-services nil)
+  (show-proxy))
+
+(defun toggle-proxy ()
+  "Toggle http/https proxy."
+  (interactive)
+  (if url-proxy-services
+      (unset-proxy)
+    (set-proxy)))
+
+(global-set-key (kbd "C-c p") 'toggle-proxy)
 
 (provide 'init-tool)
 ;;; init-basic.el ends here
